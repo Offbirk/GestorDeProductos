@@ -1,112 +1,73 @@
 import {Request, Response } from "express";
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import User from "../models/User";
-import dotenv from 'dotenv';
+import { IUserRepository, IUserService, User } from "../types/UserTypes";
+import { UserRepository } from "../repositories/userRepositories";
+import { UserService } from "../services/userService";
 
-//Load environment variables
-dotenv.config();
+const userRepository: IUserRepository = new UserRepository();
+const userService: IUserService = new UserService(userRepository);
 
-export const createUser = async (req: Request, res: Response): Promise<void> => {
+export const findUsers = async (_req: Request, res: Response):Promise<void> => {
     try {
-      const {username, email, password}  = req.body;
-      const hashedPassword = await bcrypt.hash(password, 10);
-      const existingUser = await User.findOne({email});
+        const users = await userService.findUsers();
+        if(users.length === 0) {
+            res.status(404).json({message: "Users not found"});
+            return;
+        }
 
-      if(existingUser) {
-        res.status(400).json({message: "User already created"});
-        return;
-      }
-      const newUser = new User({username, email, hashedPassword});
-      await newUser.save();
-      res.status(201).json({message: "User created successfully"});
+        res.json(users);
     } catch (error) {
-        const errorMessage = error instanceof Error ? error.message: 'An unexpected error ocurred';
-        res.status(500).json({error: errorMessage});
+        console.log("error :>> ", error);
+        res.status(500).json(error);
     }
 };
 
-// Function to validate request body
-const validateLoginInput = (email: string, password: string): boolean => {
-    if(!email || !password) {
-        return false;
-    }
-    return true;
-};
-
-// function to find user by email
-const findUserByEmail = async(email: string) => {
-    return await User.findOne({ email });
-};
-
-const secretKey = process.env.JWT_SECRET || 'defaultSecretKey';
-
-// Function to generate token
-export const generateToken = (userId: string): string => {
-    return jwt.sign({userId}, secretKey, {expiresIn: '1h'});
-};
-
-
-// Login function
-export const login = async (req: Request, res: Response): Promise<void> => {
-    const {email, password} = req.body;
-
-    if(!validateLoginInput(email, password)) {
-        res.status(400).json({message: "Invalid input"});
-        return;
-    };
-
+export const findUserById = async (req: Request, res: Response):Promise<void> =>{
     try {
-        const user = await findUserByEmail(email);
+        const user = await userService.findUserById(req.params.id);
         if(!user) {
-            res.status(404).json({message: 'User not found'});
-        } else {
-            const isValidPassword = await bcrypt.compare(password, user.password);
-            if(!isValidPassword) {
-                res.status(401).json({message: 'Incorrect password'});
-            }
-            
-            const token = generateToken(user.id);
-            res.status(200).json({message: 'Login successfully', token});  
+            res.status(404).json({message: "User not found"});
+            return;
         }
 
+        res.json(user);
     } catch (error) {
-        res.status(500).json({message: 'Error to sign up', error: (error as Error).message})
+        console.log("error :>> ", error);
+        res.status(500).json(error);
     }
-}
+};
 
-export const updatePassword = async (req: Request, res: Response):Promise<void> => {
+export const createUser = async (req: Request, res: Response) => {
     try {
-        const updatePassword = await User.findByIdAndUpdate(
-            req.params.id,
-            req.body,
-            {new: true},
-        );
-        if(!updatePassword) {
-            res.status(404).json({error: "User not found"});
-        } else {
-            res.status(200).json({
-                message: "Password update successfully",
-                user: updatePassword,
-            });
-        }
+        const newUser: User = req.body;
+        const result = await userService.createUser(newUser);
+        
+        res.status(201).json({message: "User created successfully", result: result});
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message: 'An unexpected error ocurred';
         res.status(500).json({error: errorMessage});
     }
 };
 
-export const deleteUser = async (req: Request, res: Response): Promise<void> => {
+export const updateUser = async (req: Request, res: Response) => {
     try {
-        const deletedUser = await User.findByIdAndDelete(req.params.id);
-        if(!deletedUser) {
-            res.status(404).json({error: "User not found"});
-        } else {
-            res.status(200).json({
-                message: "User deleted successfully",
-                user: deletedUser,
-            });
-        }
+        const user = await userService.updateUser(req.params.id, req.body);
+
+        if(!user) res.status(404).json({error: "User not found"});
+        
+        res.status(200).json({message: "User updated successfully", user});
+    } catch (error) {
+        const errorMessage = error instanceof Error ? error.message: 'An unexpected error ocurred';
+        res.status(500).json({error: errorMessage});
+    }
+};
+
+export const deleteUser = async (req: Request, res: Response) => {
+    try {
+        const user = await userService.deleteUser(req.params.id);
+
+        if(!user) res.status(404).json({error: "User not found"});
+        
+        res.status(200).json({message: "User deleted successfully", user});
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message: 'An unexpected error ocurred';
         res.status(500).json({error: errorMessage});
