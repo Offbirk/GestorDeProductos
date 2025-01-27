@@ -6,14 +6,14 @@ import { verifyToken } from "../middleware/auth";
 const router = Router();
 
 // Authentication Routes
-router.post('/auth/register', registerUser);
-router.post('/auth/login', loginUser);
+router.post("/auth/register", registerUser);
+router.post("/auth/login", loginUser);
 
 // User Routes
-router.get('/users', verifyToken, findUsers);
-router.get('/users/:id', verifyToken, findUserById);
-router.post('/users', verifyToken, createUser);
-router.put('/users/:id', verifyToken, updateUser);
-router.delete('/users/:id', verifyToken, deleteUser);
+router.get('/', verifyToken, findUsers);
+router.get('/:id', verifyToken, findUserById);
+router.post('/', verifyToken, createUser);
+router.put('/:id', verifyToken, updateUser);
+router.delete('/:id', verifyToken, deleteUser);
 
 export default router;

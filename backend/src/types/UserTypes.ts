@@ -5,6 +5,7 @@ export interface User extends Document {
     username: string;
     email: string;
     password: string;
+    roles: string[];
     comparePassword: (password: string) => Promise<boolean>;
 }
 

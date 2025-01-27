@@ -14,7 +14,7 @@ export const findUsers = async (_req: Request, res: Response):Promise<void> => {
             return;
         }
 
-        res.json(users);
+        res.status(200).json(users);
     } catch (error) {
         console.log("error :>> ", error);
         res.status(500).json(error);
@@ -42,6 +42,7 @@ export const createUser = async (req: Request, res: Response) => {
         const result = await userService.createUser(newUser);
         
         res.status(201).json({message: "User created successfully", result: result});
+        console.log("result:", result);
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message: 'An unexpected error ocurred';
         res.status(500).json({error: errorMessage});

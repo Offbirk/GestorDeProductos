@@ -16,7 +16,8 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
             return;
         }
         const newUser: User = req.body;
-        res.status(201).json(newUser);
+        const savedUser = await userService.createUser(newUser);
+        res.status(201).json(savedUser);
     } catch (error: any) {
         console.log("error :>> ", error);
         res.status(500).json(error.message);
