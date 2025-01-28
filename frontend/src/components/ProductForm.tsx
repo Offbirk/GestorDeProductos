@@ -1,16 +1,25 @@
 import { useState } from "react";
 import { TextInput, Label, Button } from "flowbite-react";
+import apiClient from "../api/apiClient";
 
 const ProductForm = () => {
     const [values, setValues] = useState({
         name: '',
         description: '',
         price: '',
+        category: '',
         stock: '',
     });
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        try {
+            await apiClient.post('/api/products', values);
+            alert('Product saved successfully');
+        } catch (error) {
+            alert('An error occurred while saving the product');
+            console.error("Error response: ", error);
+        }
         console.log(values);
     };
     
@@ -35,6 +44,12 @@ const ProductForm = () => {
                         <Label htmlFor="price" value="Price" />
                     </div>
                     <TextInput type="number" value={values.price} onChange={(e) => setValues({...values, price: e.target.value})} required={true} />
+                </div>
+                <div>
+                    <div className="mb-2 block">
+                        <Label htmlFor="category" value="Category" />
+                    </div>
+                    <TextInput type="text" value={values.category} onChange={(e) => setValues({...values, category: e.target.value})} required={true} />
                 </div>
                 <div>
                     <div className="mb-2 block">
