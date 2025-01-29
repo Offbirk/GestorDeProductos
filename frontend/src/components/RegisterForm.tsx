@@ -2,6 +2,8 @@ import React from "react";
 import { useState } from "react";
 import apiClient from "../api/apiClient";
 import { useNavigate} from "react-router-dom";
+import { Modal } from "flowbite-react";
+import AlertCustom from "../alert/AlertCustom";
 
 const UserForm = () => {
     const [values, setValues] = useState({
@@ -9,17 +11,23 @@ const UserForm = () => {
         email: '',
         password: '',
     })
+    const [openModal, setOpenModal] = useState(false);
+    const [alert, setAlert] = useState<{message: string, type: "success" | "failure" | null}>({ message: "", type: null});
     const navigate = useNavigate();
     
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         try {
             await apiClient.post('/api/users/auth/register', values);
-            alert('User registered successfully');            
-            navigate('/login');
+            setAlert({message: 'User registered successfully', type: "success"});
+            setOpenModal(true);
+            setTimeout(() => {
+                navigate('/login');
+            }, 3000);
         } catch (error) {
-            alert('An error occurred while registering the user');
-            console.error("Error response: ", error);            
+            setAlert({message: 'An error occurred while registering the user', type: "failure"});
+            setOpenModal(true);
+            console.error("Error response: ", error);
         }
     };
 
@@ -59,6 +67,12 @@ const UserForm = () => {
             </div>
         </div>
     </div>
+    <Modal show={openModal} onClose={() => setOpenModal(false)}>
+        <Modal.Header />
+        <Modal.Body>
+            <AlertCustom alert={alert} setAlert={setAlert} />
+        </Modal.Body>
+    </Modal>
   </section>
     );
 };

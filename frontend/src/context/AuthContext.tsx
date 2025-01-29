@@ -11,11 +11,11 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // define props to use wrapping children components 
-interface Props {
-    children?: React.ReactNode;
+interface AuthGuardProps {
+    children: React.ReactNode;
     // any props that come into the component
 }
-export const AuthProvider: React.FC<Props> = ({ children }) => {
+const AuthProvider = ({ children }: AuthGuardProps) => {    
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const login = () => setIsAuthenticated(true);
     const logout = () => setIsAuthenticated(false);
@@ -26,6 +26,8 @@ export const AuthProvider: React.FC<Props> = ({ children }) => {
         </AuthContext.Provider>
     )
 };
+
+export default AuthProvider;
 
 export const useAuth = (): AuthContextType => {
     const context = useContext(AuthContext);

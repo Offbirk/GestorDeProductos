@@ -2,12 +2,16 @@ import React from "react";
 import { useState } from "react";
 import apiClient from "../api/apiClient";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "./context/AuthContext";
+import { useAuth } from "../context/AuthContext";
+import { Modal } from "flowbite-react";
+import AlertCustom from "../alert/AlertCustom";
 
 const LoginForm = () => {
     const { login } = useAuth();
     const location = useLocation();
     const navigate = useNavigate();
+    const [openModal, setOpenModal] = useState(false);
+    const [alert, setAlert] = useState<{message: string, type: "success" | "failure" | null}>({ message: "", type: null});
 
     const [values, setValues] = useState({
         email: '',
@@ -18,13 +22,20 @@ const LoginForm = () => {
         e.preventDefault()
         try {
             await apiClient.post('/api/users/auth/login', values);
-            alert('Welcome to the app!');
             login();
-            const from = location.state?.from?.pathname || '/products';
-            navigate(from);
+            setAlert({message: "Welcome to the app!", type: "success"});
+            setOpenModal(true)
+            setTimeout(() => {
+                const from = location.state?.from?.pathname || '/products';
+                navigate(from);
+            }, 3000);
         } catch (error) {
-            alert('Username or password incorrect');
-            console.error("Error response: ", error);            
+            setOpenModal(true);
+            setAlert({message: "Username or password incorrect", type: "failure"});
+            console.error("Error response: ", error);
+            setTimeout(() => {
+                setOpenModal(false);
+            }, 3000);   
         }
     };
 
@@ -63,6 +74,12 @@ const LoginForm = () => {
                 </form>
             </div>
         </div>
+        <Modal show={openModal} size="md" onClose={() => setOpenModal(false)} popup>
+            <Modal.Header />
+            <Modal.Body>
+                <AlertCustom alert={alert} setAlert={setAlert} />
+            </Modal.Body>
+        </Modal>
     </div>
   </section>
     );

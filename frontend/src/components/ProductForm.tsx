@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { TextInput, Label, Button, Modal } from "flowbite-react";
 import apiClient from "../api/apiClient";
-import ProductsNavbar from "./navbar/Navbar";
-import AlertCustom from "./alert/AlertCustom";
+import ProductsNavbar from "../navbar/Navbar";
+import AlertCustom from "../alert/AlertCustom";
 
 interface Product {
     _id: string;
@@ -29,7 +29,7 @@ const ProductForm: React.FC<ProductFormProps> = ({product, onSave, isEditMode, i
         category: '',
         stock: ''
     });
-    const [openModal, setOpenModal] = useState(true);
+    const [openModal, setOpenModal] = useState(false);
     const [alert, setAlert] = useState<{ message: string;
         type: "success" | "failure" | null}>({ message: "", type: null});
 
@@ -46,11 +46,22 @@ const ProductForm: React.FC<ProductFormProps> = ({product, onSave, isEditMode, i
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        //Should delete _id if you're creating a new product
+        const {_id, ...productData } = values;
+
+        // Call onSave then send the product
         onSave(values);
         try {
-            await apiClient.post('/api/products', values);
-            setOpenModal(true);
-            setAlert({message: "Product saved successfully", type: "success"});
+            if (isEditMode) {
+                await apiClient.put(`/api/products/${_id}`, productData);
+                setAlert({ message: "Changes saved successfully", type: "success" });
+                setOpenModal(true);
+            } else {
+                await apiClient.post('/api/products', productData);
+                setAlert({message: "Product saved successfully", type: "success"});
+                setOpenModal(true);
+            }
         } catch (error) {
             setOpenModal(true);
             setAlert({message: "Sorry, ocurred an unexpected error", type: "failure"});
@@ -63,7 +74,7 @@ const ProductForm: React.FC<ProductFormProps> = ({product, onSave, isEditMode, i
         <>
         <ProductsNavbar />
         <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-            <h1 className="font-bold text-2xl">Product Form</h1>            
+            <h1 className="font-bold text-2xl text-yellow-400">Product Form</h1>            
             <form className="flex max-w-md flex-col gap-4" onSubmit={handleSubmit}>
                 <div>
                     <div className="mb-2 block">

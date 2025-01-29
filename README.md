@@ -19,10 +19,7 @@
 7. Levantar el servidor del backend con el comando <code>npm run start</code>
 8. Iniciar la aplicación en el frontend <code>npm run dev</code>.
 
-
-Para resolver tu duda, es importante entender cómo está configurada la lógica de autenticación y autorización en tu aplicación. Según el código que has compartido, la ruta para `createUser` está protegida por el middleware `verifyToken`. Esto significa que cualquier solicitud a esta ruta requiere un JWT válido para ser procesada.
-
-### Flujo de Registro y Autenticación
+### Flujo de Registro y Autenticación en Backend
 
 1. **Registro de Usuario (`registerUser`)**:
    - Esta ruta (`/auth/register`) permite crear un nuevo usuario sin necesidad de un JWT, ya que es el punto de entrada para nuevos usuarios.
@@ -55,7 +52,7 @@ Para implementar rutas protegidas, se implementaron estos pasos:
 
 ### Consideraciones
 
-- **Estado de Autenticación**: Asegúrate de que el estado de autenticación se actualice correctamente al iniciar y cerrar sesión.
+- **Estado de Autenticación**: Se asegura de que el estado de autenticación se actualice correctamente al iniciar y cerrar sesión.
 - **Redirección**: Los usuarios no autenticados son redirigidos a la página de inicio de sesión.
 
     >Esta configuración permitirá gestionar el acceso a las rutas de productos de manera efectiva, asegurando que solo los usuarios autenticados puedan acceder a ellas.

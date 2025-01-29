@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import ProductsNavbar from "./navbar/Navbar";
+import ProductsNavbar from "../navbar/Navbar";
 import apiClient from "../api/apiClient";
 import { Button, Drawer, Modal, Table } from "flowbite-react";
 import ProductForm from "./ProductForm";
-import AlertCustom from "./alert/AlertCustom";
+import AlertCustom from "../alert/AlertCustom";
 
 interface Product {
   _id: string;
@@ -18,7 +18,7 @@ const Products = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [openModal, setOpenModal] = useState(true);
+  const [openModal, setOpenModal] = useState(false);
   const [alert, setAlert] = useState<{ message: string; 
     type: "success" | "failure" | null}>({message: "", type: null});
 
@@ -27,7 +27,7 @@ const Products = () => {
   useEffect(() => {
     apiClient.get('/api/products')
       .then(response => setProducts(response.data))
-      .catch(error => console.error("Error fetching data:", error));
+      .catch(error => console.error("Error fetching data: ", error));
   }, []);
 
   const handleEdit = (product: Product) => {
@@ -38,13 +38,9 @@ const Products = () => {
   const handleSaveChanges = async (updatedProduct: Product) => {
       try {
         await apiClient.put(`/api/products/${updatedProduct._id}`, updatedProduct);
-        setProducts(products.map(p => p._id === updatedProduct._id ? updatedProduct : p));
-        setOpenModal(true);
-        setAlert({ message: "Changes saved successfully", type: "success" });
+        setProducts(products.map(p => p._id === updatedProduct._id ? updatedProduct : p));        
         handleClose();
       } catch (error) {
-        setOpenModal(true);
-        setAlert({ message: "Sorry, an unexpected error occurred", type: "failure"});
         console.error("Error saving changes:", error);      
       }    
   };
@@ -54,7 +50,10 @@ const Products = () => {
       await apiClient.delete(`/api/products/${id}`);
       setOpenModal(true);
       setAlert({ message: "Product deleted successfully", type: "success" });
-      setProducts(products.filter(product => product._id !== id));
+      setTimeout(() => {
+        setProducts(products.filter(product => product._id !== id));
+        setOpenModal(false);
+      }, 3000);
     } catch (error) {
       setOpenModal(true);
       setAlert({ message: "Sorry, an unexpected error occurred", type: "failure"});
@@ -99,9 +98,9 @@ const Products = () => {
         </div>
       </div>
       <Drawer open={isOpen} onClose={handleClose}>
-        <Drawer.Header title="EDIT PRODUCT"/>
+        <Drawer.Header className="pt-16" title="EDIT PRODUCT"/>
         {selectedProduct && <ProductForm product={selectedProduct} onSave={handleSaveChanges}
-        isEditMode={true} isSaveDisabled={false}/>}
+          isEditMode={true} isSaveDisabled={false} />}
       </Drawer>
       <Modal show={openModal} size="md" onClose={() => setOpenModal(false)} popup>
         <Modal.Header />

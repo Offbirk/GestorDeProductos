@@ -1,7 +1,10 @@
 import { Card } from "flowbite-react";
+import ProductsNavbar from "../navbar/Navbar";
 
-export function ProductCard() {
+const ProductCard = () => {
   return (
+    <>
+    <ProductsNavbar />
     <Card
       className="max-w-sm"
       imgAlt="Apple Watch Series 7 in colors pink, silver, and black"
@@ -67,5 +70,8 @@ export function ProductCard() {
         </a>
       </div>
     </Card>
+    </>
   );
 }
+
+export default ProductCard;
