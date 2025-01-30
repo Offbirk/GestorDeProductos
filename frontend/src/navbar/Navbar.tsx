@@ -1,16 +1,19 @@
 import { Button, Navbar } from "flowbite-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const ProductsNavbar = () => {
   const { logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const logOff = async () => {
     console.log("Out");
     logout();
     navigate('login');
   };
+
+  const isActive = (path: string) => location.pathname === path;
 
   return (
     <div className="fixed top-0 left-0 w-full z-10">
@@ -23,10 +26,10 @@ const ProductsNavbar = () => {
         <Navbar.Toggle />
       </div>
       <Navbar.Collapse>
-        <Link to="#">Home</Link>
-        <Link to="/productsForm">Create</Link>
-        <Link to="/products">Get</Link>
-        <Link to="/productCard">Update</Link>
+        <Link to="/home" className={isActive('/home') ? 'active' : ''}>Home</Link>
+        <Link to="/productsForm" className={isActive('/productsForm') ? 'active' : ''}>Create product</Link>
+        <Link to="/products" className={isActive('/products') ? 'active' : ''}>List of products</Link>
+        <Link to="/productCard" className={isActive('/productCard') ? 'active' : ''}>Catalog</Link>
       </Navbar.Collapse>
     </Navbar>
     </div>

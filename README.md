@@ -4,12 +4,15 @@
 
 1. Clonar el repositorio
 2. Abrir el proyecto en el editor de código de su preferencia.
-3. Crear el archivo .env dentro de la carpeta backend y rellenar los campos según su máquina local:
+3. Crear el archivo .env dentro de la carpeta backend y rellenar los campos según su máquina local para poder crear la
+conexión con un puerto y la base de datos de Mongo:
 
         PORT = your_port
         MONGO_URI = your_mongodb_connection_string
         JWT_SECRET = your_jwt_secret
 
+   >**Nota:** el JWT_SECRET será una variable de tipo string sin incluir las comillas
+  
 4. Crear el archivo .env dentro de la carpeta frontend:
 
         VITE_REACT_APP_API_URL = your_url_and_port_to_get_connection

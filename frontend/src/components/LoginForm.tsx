@@ -26,7 +26,7 @@ const LoginForm = () => {
             setAlert({message: "Welcome to the app!", type: "success"});
             setOpenModal(true)
             setTimeout(() => {
-                const from = location.state?.from?.pathname || '/products';
+                const from = location.state?.from?.pathname || '/productsForm';
                 navigate(from);
             }, 3000);
         } catch (error) {
